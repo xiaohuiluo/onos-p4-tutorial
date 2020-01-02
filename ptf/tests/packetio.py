@@ -68,8 +68,8 @@ class PacketOutTest(P4RuntimeTest):
             packet_out_msg = self.helper.build_packet_out(
                 payload=str(pkt),
                 metadata={
-                    "MODIFY ME - METADATA NAME": outport,
-                    "MODIFY ME - METADATA NAME": 0
+                    "egress_port": outport,
+                    "_pad": 0
                 })
             # ---- END SOLUTION ----
 
@@ -111,12 +111,12 @@ class PacketInTest(P4RuntimeTest):
         # clone_to_cpu action.
         # ---- START SOLUTION ----
         self.insert(self.helper.build_table_entry(
-            table_name="MODIFY ME",
+            table_name="IngressPipeImpl.acl",
             match_fields={
                 # Ternary match (value, mask)
-                "MODIFY ME - MATCH FIELD NAME": (eth_type, 0xffff)
+                "hdr.ethernet.ether_type": (eth_type, 0xffff)
             },
-            action_name="MODIFY ME",
+            action_name="IngressPipeImpl.clone_to_cpu",
             priority=DEFAULT_PRIORITY
         ))
         # ---- END SOLUTION ----
@@ -129,8 +129,8 @@ class PacketInTest(P4RuntimeTest):
             exp_packet_in_msg = self.helper.build_packet_in(
                 payload=str(pkt),
                 metadata={
-                    "MODIFY ME - METADATA NAME": inport,
-                    "MODIFY ME - METADATA NAME": 0
+                    "ingress_port": inport,
+                    "_pad": 0
                 })
             # ---- END SOLUTION ----
 

@@ -254,6 +254,10 @@ control EgressPipeImpl (inout parsed_headers_t hdr,
         //    ingress port (standard_metadata.ingress_port).
         // ---- START SOLUTION ----
         if (standard_metadata.egress_port == CPU_PORT) {
+
+             hdr.packet_in.setValid();
+             hdr.packet_in.ingress_port = standard_metadata.ingress_port;
+             exit;
         }
         // ---- END SOLUTION ----
 
