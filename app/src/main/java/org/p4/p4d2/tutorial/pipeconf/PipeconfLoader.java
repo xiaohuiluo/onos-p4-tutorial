@@ -38,8 +38,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.onosproject.net.pi.model.PiPipeconf.ExtensionType.BMV2_JSON;
-import static org.onosproject.net.pi.model.PiPipeconf.ExtensionType.P4_INFO_TEXT;
+import static org.onosproject.net.pi.model.PiPipeconf.ExtensionType.*;
 import static org.p4.p4d2.tutorial.AppConstants.PIPECONF_ID;
 
 /**
@@ -51,7 +50,14 @@ public final class PipeconfLoader {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private static final String P4INFO_PATH = "/p4info.txt";
+
     private static final String BMV2_JSON_PATH = "/bmv2.json";
+
+    private static final String TOFINO_JSON_PATH = "/context.json";
+
+    private static final String TOFINO_BIN_PATH = "/tofino.bin";
+
+    private static final String CPU_PORT_PATH = "/cpu_port.txt";
 
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY)
@@ -85,6 +91,11 @@ public final class PipeconfLoader {
 
         final URL p4InfoUrl = PipeconfLoader.class.getResource(P4INFO_PATH);
         final URL bmv2JsonUrlUrl = PipeconfLoader.class.getResource(BMV2_JSON_PATH);
+
+        final URL jsonUrl = PipeconfLoader.class.getResource(TOFINO_JSON_PATH);
+        final URL binUrl = PipeconfLoader.class.getResource(TOFINO_BIN_PATH);
+        final URL cpuPortUrl = PipeconfLoader.class.getResource(CPU_PORT_PATH);
+
         final PiPipelineModel pipelineModel = P4InfoParser.parse(p4InfoUrl);
 
         return DefaultPiPipeconf.builder()
@@ -94,6 +105,9 @@ public final class PipeconfLoader {
                 .addBehaviour(Pipeliner.class, PipelinerImpl.class)
                 .addExtension(P4_INFO_TEXT, p4InfoUrl)
                 .addExtension(BMV2_JSON, bmv2JsonUrlUrl)
+//                .addExtension(TOFINO_CONTEXT_JSON, jsonUrl)
+//                .addExtension(CPU_PORT_TXT, cpuPortUrl)
+//                .addExtension(TOFINO_BIN, binUrl)
                 .build();
     }
 

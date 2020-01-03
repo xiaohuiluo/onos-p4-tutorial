@@ -49,6 +49,32 @@ control IngressPipeImpl (inout parsed_headers_t hdr,
         local_metadata.is_multicast = true;
     }
 
+    direct_counter(CounterType.packets_and_bytes) l2_fwd_exact_table_counter;
+    table l2_fwd_exact_table {
+        key = {
+            hdr.ethernet.dst_addr: exact;
+        }
+        actions = {
+            set_output_port;
+            @defaultonly NoAction;
+        }
+        const default_action = NoAction;
+        counters = l2_fwd_exact_table_counter;
+    }
+
+    direct_counter(CounterType.packets_and_bytes) l2_fwd_ternary_table_counter;
+    table l2_fwd_ternary_table {
+        key = {
+            hdr.ethernet.dst_addr: ternary;
+        }
+        actions = {
+            set_multicast_group;
+            drop;
+        }
+        const default_action = drop;
+        counters = l2_fwd_ternary_table_counter;
+    }
+
 
     /*
      * TODO EXERCISE 3
@@ -236,6 +262,11 @@ control IngressPipeImpl (inout parsed_headers_t hdr,
         // TODO EXERCISE 2
         // Insert logic to apply your L2 table(s). You probably want to chain them together with a conditional
         // based on whether or not there was a hit in the first one.
+        if (!local_metadata.skip_l2 && standard_metadata.drop != 1w1) {
+            if(!l2_fwd_exact_table.apply().hit) {
+                l2_fwd_ternary_table.apply();
+            }
+        }
 
         acl.apply();
     }
